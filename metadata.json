@@ -1,0 +1,6 @@
+{
+  "name": "ColdBreak",
+  "description": "Autonomous procrastination intervention agent powered by a Gemini ReAct loop, managing your time through Google Calendar and Gmail.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

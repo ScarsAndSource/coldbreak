@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Active task documents: tasks/{uid}
+    // Owned by the user OR accessible as demo-user-001 (no real auth)
+    match /tasks/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Connection testing
+    match /test/connection {
+      allow read: if true;
+    }
+
+    // User profile, missions, context files, context chunks: users/{uid}/...
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // RAG document store: documents/{docId} and subcollections
+    // Written by server-side admin; readable by authenticated users for retrieval
+    match /documents/{docId} {
+      allow read: if request.auth != null;
+      allow write: if false; // server-side only via Admin SDK
+    }
+    match /documents/{docId}/chunks/{chunkId} {
+      allow read: if request.auth != null;
+      allow write: if false; // server-side only via Admin SDK
+    }
+
+    // DEMO MODE fallback: allow demo-user-001 documents without real Firebase auth
+    // This is safe because the demo UID is publicly known and contains no PII
+    match /tasks/demo-user-001 {
+      allow read, write: if true;
+    }
+    match /users/demo-user-001/{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

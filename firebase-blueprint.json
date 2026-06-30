@@ -1,0 +1,110 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User behavioral profile and configurations",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Unique Google user ID"
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address"
+        },
+        "gamma": {
+          "type": "number",
+          "description": "Procrastination coefficient Gamma (default 0.5)"
+        },
+        "archetype": {
+          "type": "string",
+          "description": "Procrastination archetype"
+        },
+        "completionCount": {
+          "type": "integer",
+          "description": "Number of completed tasks"
+        }
+      },
+      "required": ["uid", "email", "gamma", "archetype"]
+    },
+    "Task": {
+      "title": "Procrastination Task",
+      "description": "A task with a deadline managed by ColdBreak",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Task ID"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner ID"
+        },
+        "taskText": {
+          "type": "string",
+          "description": "Core task description"
+        },
+        "recipient": {
+          "type": "string",
+          "description": "Task recipient email address"
+        },
+        "deadline": {
+          "type": "string",
+          "description": "ISO timestamp of the task deadline"
+        },
+        "stakeLevel": {
+          "type": "string",
+          "description": "Stake level: low, medium, or high"
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the ReAct process"
+        },
+        "mScore": {
+          "type": "number",
+          "description": "Current procrastination risk score (0-100)"
+        },
+        "expectancy": {
+          "type": "number",
+          "description": "Self-reported expectancy of success (1-10)"
+        },
+        "value": {
+          "type": "number",
+          "description": "Self-reported task importance / value (1-10)"
+        },
+        "watchdogTime": {
+          "type": "string",
+          "description": "ISO timestamp of when the watchdog fires"
+        },
+        "watchdogTriggered": {
+          "type": "boolean",
+          "description": "Whether the crisis watchdog has fired"
+        },
+        "steps": {
+          "type": "array",
+          "description": "List of decomposed action steps"
+        },
+        "reactLogs": {
+          "type": "array",
+          "description": "Logs recorded during the ReAct loop execution"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when task was created"
+        }
+      },
+      "required": ["id", "userId", "taskText", "recipient", "deadline", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Collection of user configurations and stats"
+    },
+    "/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "Collection of tasks managed by the agent"
+    }
+  }
+}

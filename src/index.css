@@ -1,0 +1,341 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Code", monospace;
+
+  /*
+   * Zinc → Cold Slate remap.
+   * Every text-zinc-*, bg-zinc-*, border-zinc-* in App.tsx
+   * inherits these automatically. No App.tsx changes needed for these.
+   * Direction: neutral warm grey → desaturated blue-grey (cold).
+   */
+  --color-zinc-950: #06080E;
+  --color-zinc-900: #0A0D16;
+  --color-zinc-800: #10141E;
+  --color-zinc-700: #182030;
+  --color-zinc-600: #253040;
+  --color-zinc-500: #445060;
+  --color-zinc-400: #788898;
+  --color-zinc-300: #A8B8C8;
+  --color-zinc-200: #C8D4E0;
+  --color-zinc-100: #DDE6F0;
+  --color-zinc-50:  #EDF2F8;
+}
+
+/* ─── Custom Properties ─────────────────────────────────────────── */
+
+:root {
+  color-scheme: dark;
+
+  /* Backgrounds — four steps from void to elevated */
+  --bg-void:    #08090F;
+  --bg-base:    #0C0F18;
+  --bg-card:    #101420;
+  --bg-surface: #141A28;
+  --bg-hover:   #1A2234;
+
+  /*
+   * Borders — semi-transparent, cold-temperature tint.
+   * Using transparency means they adapt to whatever sits behind them.
+   */
+  --border-ghost:   rgba(180, 210, 240, 0.04);
+  --border-subtle:  rgba(180, 210, 240, 0.08);
+  --border-default: rgba(180, 210, 240, 0.13);
+  --border-strong:  rgba(180, 210, 240, 0.22);
+
+  /* Text — cold off-white. Not pure white. Never pure white on dark. */
+  --text-primary:   #C8D4E8;
+  --text-secondary: #788AA8;
+  --text-muted:     #485870;
+
+  /*
+   * Accent — muted cold teal.
+   * HSL: 172°, 44%, 43%. The color of arctic water or old copper.
+   * Not cyan (too cyberpunk), not blue (too expected), not green (too terminal).
+   */
+  --accent:           #3A9E8A;
+  --accent-bright:    #4AB8A2;
+  --accent-dim:       rgba(58, 158, 138, 0.08);
+  --accent-mid:       rgba(58, 158, 138, 0.16);
+
+  /* Live accent — overridden by urgency states below */
+  --live-accent:             #3A9E8A;
+  --live-accent-glow:        rgba(58, 158, 138, 0.06);
+  --live-accent-glow-strong: rgba(58, 158, 138, 0.14);
+}
+
+/* ─── Urgency States ────────────────────────────────────────────── */
+
+[data-temp="cold"] {
+  --live-accent:             #3A9E8A;
+  --live-accent-glow:        rgba(58, 158, 138, 0.06);
+  --live-accent-glow-strong: rgba(58, 158, 138, 0.14);
+}
+
+[data-temp="warm"] {
+  /* Oxidised copper amber — aged instrument dial, not warning sign */
+  --live-accent:             #C4922A;
+  --live-accent-glow:        rgba(196, 146, 42, 0.06);
+  --live-accent-glow-strong: rgba(196, 146, 42, 0.14);
+}
+
+[data-temp="hot"] {
+  /* Controlled crimson — urgency without panic */
+  --live-accent:             #C05050;
+  --live-accent-glow:        rgba(192, 80, 80, 0.06);
+  --live-accent-glow-strong: rgba(192, 80, 80, 0.14);
+}
+
+/* ─── Base ──────────────────────────────────────────────────────── */
+
+html, body, #root {
+  height: 100%;
+  background-color: var(--bg-void);
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+
+  /*
+   * antialiased: grayscale AA — thinner strokes, cleaner on Retina.
+   * grayscale (Firefox): same effect on macOS Firefox.
+   * optimizeLegibility: enables proper kerning pairs and ligatures.
+   */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* ─── Engineering Grid Background ───────────────────────────────── */
+/*
+ * Replaces the aurora blobs entirely.
+ * A barely-visible dot grid — like drafting paper or a logic analyser grid.
+ * At 1.5% opacity you don't consciously see it, but it gives the
+ * interface a sense of inhabiting a precise, calibrated surface.
+ * This is the kind of detail that separates "designed" from "generated."
+ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(
+    circle,
+    rgba(180, 210, 240, 0.15) 1px,
+    transparent 1px
+  );
+  background-size: 28px 28px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.55; /* effectively ~1.5% visible dot opacity */
+}
+
+/* ─── Aurora — Removed ──────────────────────────────────────────── */
+/*
+ * The aurora blobs are gone.
+ * Animated gradient blobs are the single most "AI slop" element
+ * in dark UI right now. Their absence IS the aesthetic statement.
+ * The dot grid above provides depth without performance cost or
+ * visual noise.
+ */
+.aurora-bg,
+.aurora-glow-1,
+.aurora-glow-2 {
+  display: none;
+}
+
+/* ─── Monospace Typography ──────────────────────────────────────── */
+/*
+ * JetBrains Mono replaces Courier New.
+ * Key improvements:
+ * — 20% taller x-height (physically larger glyphs at same font-size)
+ * — Proper screen hinting down to 10px (kills the pixel-crawl)
+ * — Character disambiguation: 0/O, 1/l/I clearly distinct
+ * — Designed specifically to reduce eye fatigue at small sizes
+ *
+ * Letter spacing: JetBrains Mono is wider than Courier New, so it
+ * needs far less artificial tracking to feel open. 0.02em (not 0.1em).
+ *
+ * font-feature-settings:
+ * — kern: proper kerning pairs
+ * — calt: contextual alternates (the subtly adjusted letterforms
+ *   JetBrains Mono uses to improve readability in sequence)
+ */
+.font-mono {
+  letter-spacing: 0.02em;
+  font-feature-settings: 'kern' 1, 'calt' 1;
+}
+
+/* ─── Font Size Floor ───────────────────────────────────────────── */
+/*
+ * 8px and 9px with any monospace font is not readable — it's noise.
+ * These overrides enforce a floor without touching App.tsx at all.
+ * 10px Tailwind classes also lifted to 11px for Courier New legacy
+ * removal (JetBrains Mono is more spacious, 11px reads cleanly).
+ */
+.text-\[8px\]  { font-size: 10px !important; letter-spacing: 0.03em; }
+.text-\[9px\]  { font-size: 11px !important; }
+.text-\[10px\] { font-size: 11px !important; }
+
+/* ─── Glass Panel ───────────────────────────────────────────────── */
+
+.cryo-glass {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 0 0 0.5px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.cryo-glass-interactive:hover {
+  border-color: var(--border-default);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.6),
+    0 0 0 0.5px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── Film Grain — Retained, Reduced ───────────────────────────── */
+/*
+ * Kept at a very low opacity. Grain adds a handmade, photographic
+ * quality that distinguishes the interface from perfectly sterile
+ * digital renders. 0.02 is nearly imperceptible — you feel it
+ * more than see it.
+ */
+.film-grain {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.02;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ─── CRT Panel — Retained, Refined ────────────────────────────── */
+/*
+ * The scanline concept is correct for the ColdBreak aesthetic.
+ * The original 0.1 opacity was bisecting letterforms at 9px text.
+ * At 0.025 it reads as texture — like aged phosphor — not destruction.
+ *
+ * Changed from a sharp 50%/50% hard-edge scanline to a softer
+ * repeating gradient. The original hard edge at 4px intervals
+ * was the direct cause of glyph fragmentation at small sizes.
+ */
+.crt-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.crt-panel::after {
+  content: " ";
+  display: block;
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0, 0, 0, 0.06) 3px,
+    rgba(0, 0, 0, 0.06) 4px
+  );
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ─── CRT Scanner ───────────────────────────────────────────────── */
+/*
+ * Slowed from 6s to 14s. At 6s it felt anxious and gamey.
+ * At 14s it reads as a living system quietly breathing.
+ */
+.crt-scanner {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 45%,
+    var(--live-accent-glow) 65%,
+    transparent 85%
+  );
+  animation: scanline-anim 14s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ─── Scrollbars ────────────────────────────────────────────────── */
+/*
+ * Thinner (3px), no bright accent color on track.
+ * The thumb is a subtle border color, not the live accent.
+ * Scrollbars should be invisible until needed, functional not decorative.
+ */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+/* ─── Range Input ───────────────────────────────────────────────── */
+
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 2px;
+  background: var(--border-subtle);
+  border-radius: 2px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--live-accent);
+  cursor: pointer;
+  /* No glow. The colour is enough. */
+  transition: transform 0.15s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.3);
+}
+
+/* ─── Live Accent Tailwind Utilities ────────────────────────────── */
+
+.text-live-accent   { color: var(--live-accent); }
+.border-live-accent { border-color: var(--live-accent); }
+.bg-live-accent     { background-color: var(--live-accent); }
+
+.shadow-live-glow {
+  /* Original was a generic drop-shadow. This is now correctly a glow. */
+  box-shadow: 0 0 16px var(--live-accent-glow-strong);
+}
+
+/* ─── Animations ────────────────────────────────────────────────── */
+
+@keyframes scanline-anim {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+@keyframes xp-flash-anim {
+  0%   { transform: translateY(0); opacity: 0; }
+  20%  { transform: translateY(-10px); opacity: 1; }
+  100% { transform: translateY(-40px); opacity: 0; }
+}
+
+@keyframes pulse-once {
+  0%   { transform: scale(1); opacity: 0.4; }
+  50%  { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.4; }
+}
+
+.animate-xp-flash   { animation: xp-flash-anim 0.8s ease-out forwards; }
+.animate-pulse-once { animation: pulse-once 2.5s ease-out infinite; }
